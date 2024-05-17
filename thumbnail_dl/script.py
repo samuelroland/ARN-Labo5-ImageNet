@@ -6,8 +6,8 @@ import yt_dlp
 # YouTube channel URLs
 CHANNEL_URLS = {
     'Linus Tech Tips': 'https://www.youtube.com/c/LinusTechTips/videos',
-    'Underscore': 'https://www.youtube.com/c/underscore/videos',
-    'Computerphile': 'https://www.youtube.com/c/Computerphile/videos'
+    'Underscore': 'https://www.youtube.com/@Underscore_/videos',
+    'Computerphile': 'https://www.youtube.com/@Computerphile/videos'
 }
 
 # Directory to save thumbnails
