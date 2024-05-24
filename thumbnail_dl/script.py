@@ -5,19 +5,23 @@ import yt_dlp
 
 # YouTube channel URLs
 CHANNEL_URLS = {
-    'Linus Tech Tips': 'https://www.youtube.com/c/LinusTechTips/videos',
-    'Underscore': 'https://www.youtube.com/c/underscore/videos',
-    'Computerphile': 'https://www.youtube.com/c/Computerphile/videos'
+    'Underscore': 'https://www.youtube.com/@Underscore_/videos',
+    'Computerphile': 'https://www.youtube.com/@Computerphile/videos'
 }
 
 # Directory to save thumbnails
 THUMBNAIL_DIR = 'thumbnails'
 
+TEST_DIR = 'test'
+
 # Create directory if it doesn't exist
 if not os.path.exists(THUMBNAIL_DIR):
     os.makedirs(THUMBNAIL_DIR)
 
-def download_thumbnails(channel_name, channel_url, max_results=200):
+if not os.path.exists(TEST_DIR):
+    os.makedirs(TEST_DIR)
+
+def download_thumbnails(channel_name, channel_url, max_results=250):
     ydl_opts = {
         'quiet': True,
         'extract_flat': 'in_playlist',
@@ -34,7 +38,12 @@ def download_thumbnails(channel_name, channel_url, max_results=200):
         if not os.path.exists(channel_dir):
             os.makedirs(channel_dir)
 
+
         for i, video_id in enumerate(video_ids):
+            if i == 200:
+                channel_dir = os.path.join(TEST_DIR, channel_name.replace(' ', '_'))
+                if not os.path.exists(channel_dir):
+                    os.makedirs(channel_dir)
             thumbnail_url = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
             response = requests.get(thumbnail_url)
             if response.status_code == 200:
