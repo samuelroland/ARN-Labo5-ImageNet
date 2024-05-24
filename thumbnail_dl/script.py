@@ -23,7 +23,7 @@ if not os.path.exists(THUMBNAIL_DIR):
 if not os.path.exists(TEST_DIR):
     os.makedirs(TEST_DIR)
 
-def download_thumbnails(channel_name, channel_url, max_results=250):
+def download_thumbnails(channel_name, channel_url, max_results=230):
     ydl_opts = {
         'quiet': True,
         'extract_flat': 'in_playlist',
