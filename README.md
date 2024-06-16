@@ -1,4 +1,4 @@
-# Labo 5 - ARN
+# Labo 5 - ARN - ImageNet
 Auteurs: Felix Breval et Samuel Roland
 
 ## Introduction
@@ -24,9 +24,9 @@ Comme on peut le voir en partie sur les vignettes au-dessus, elles contiennent
 1. **Computerphile**: toujours un titre en lettre verte dans une police bien particulière, avec souvent un visage mais jamais le même
 1. **Linus Tech Tips**: très souvent la tête de Linus avec un visage d'étonnement la bouche ouverte ou alors tout son corps, souvent accompagné d'un objet
 
-Nous avons imaginé que certaines de ces caractéristiques qui reviennent constamment seraient utilisées par le modèle, nous verrons plus tard avec les résultats si c'est le cas ou non. Concernant la variété à l'interne d'une même classe, on voit que c'est bien diversifié: par ex. les vignettes d'Underscore_ ont différents formats (cela a évolué au fil du temps), n'ont pas toujours de visage, ont parfois plusieurs visages, ont parfois Micode, parfois d'autres personnes, parfois il y a un fond bleu très clair, d'autres fois c'est plus léger ou inexistant. En termes de difficulté lié aux similarités entre les classes, cela nous parait pas trop compliqué à part qu'il y a souvent des visages expressifs (comme les Youtubeurs aiment bien faire), il y a souvent des logos de géants de la tech et des titres parfois dans les mêmes couleurs (rouge, blanc).
+Nous avons imaginé que certaines de ces caractéristiques qui reviennent constamment seraient utilisées par le modèle, nous verrons plus tard avec les résultats si c'est le cas ou non. Concernant la variété à l'interne d'une même classe, on voit que c'est bien diversifié: par ex. les vignettes d'Underscore_ ont différents formats (cela a évolué au fil du temps), n'ont pas toujours de visage, ont parfois plusieurs visages, ont parfois Micode, parfois d'autres personnes, parfois il y a un fond bleu très clair, d'autres fois c'est plus léger ou inexistant. En termes de difficulté lié aux similarités entre les classes, cela ne nous parait pas trop compliqué à part qu'il y a souvent des visages expressifs (comme les Youtubeurs aiment bien faire), il y a souvent des logos de géants de la tech et des titres parfois dans les mêmes couleurs (rouge, blanc).
 
-Nous avons téléchargé les dernières **200** vignettes de chaque chaîne pour l'entrainement et pris les **30** suivantes comme ensemble de test. Nous avons développé un petit script Python `thumbnail_dl/script.py` permettant de facilement les récupérer, il suffit de le lancer depuis le dossier `thumbnail_dl` pour qu'il télécharge toutes les images nécessaires. Durant le téléchargement, il y a parfois quelques images qui génèrent des erreurs et ne sont pas téléchargées mais cela ne concerne que 1 image pour Linus Tech Tips et Computerphile, et 4 pour Underscore_. Nous n'avons pas cherché à utiliser plus d'images car la chaîne Underscore_ étant récente, elle n'a pas plus de 230 vidéos publiées.
+Nous avons téléchargé les dernières **200** vignettes de chaque chaîne pour l'entrainement et pris les **30** suivantes comme ensemble de test. Nous avons développé un petit script Python `thumbnail_dl/script.py` permettant de facilement les récupérer, il suffit de le lancer depuis le dossier `thumbnail_dl` pour qu'il télécharge toutes les images nécessaires. Durant le téléchargement, il y a parfois quelques images qui génèrent des erreurs et ne sont pas téléchargées, mais cela ne concerne que 1 image pour Linus Tech Tips et Computerphile, et 4 pour Underscore_. Nous n'avons pas cherché à utiliser plus d'images car la chaîne Underscore_ étant récente, elle n'a pas plus de 230 vidéos publiées.
 
 ![sizes](./imgs/dataset-sizes.png)
 
@@ -55,22 +55,21 @@ image_augmentations = Sequential([
 ```
 
 Le preprocessing et l'augmentation peut se visualiser ci-dessous:
-![augmentation](./imgs/augmentation.png)
+![augmentation.png](imgs/augmentation.png)
 
 ## Conception du modèle
 <!-- 4.Model creation: describe how did you proceed to come up with a nal model (model selection methodology, hyper-parameter exploration, cross-validation) -->
 Notre modèle finale est défini par
-- entrainement sur TODO: epochs
+- entrainement sur 30: epochs
 - une taille de batch de 32
 - optimizer: RMSProp
-- todo folds
+- 2 folds
 - loss function: SparseCategoricalCrossentropy
 
 Notre architecture consiste en toutes les couches non denses de ImageNet + les couches suivantes:
 - Global average pooling (puis c'est l'entrée du MLP il nous faut revenir en 1 dimension)
 - Dropout de 30%
 - Couche dense de 100 neurones utilisant la Relu
-- Dropout de 30% à nouveau
 - Couche dense de sortie de 3 neurones utilisant la softmax
 
 Cette nouvelle partie compte **128,403** paramètres entrainables. Les couches existantes du MobileNetV2 contient **2,257,984** paramètres, mais ceux-ci sont gelés donc non entrainables.
@@ -82,40 +81,34 @@ Nous n'avons pas eu le temps de tester notre modèle sur application mobile, nou
 
 Graphes obtenus:
 ![train_charts](imgs/train_charts.png)
-On obtient quand même pas mal d'overfitting malgré notre dropout.
 
+On obverse qu'après 10 epoques, on atteint déjà un peu le maximum possible et que cela s'améliore plus beaucoup, à part au niveau de tous les folds (le trait s'aminscit). Les 2 courbes de validation par contre c'est beaucoup plus mitigé, les traits sont très épais et l'amélioration n'est pas très clair. On obtient quand même pas mal d'overfitting malgré notre dropout.
 
+Sur le test set, notre matrice de confusion montre que Linus Tech Tips est très bien classifié, de même pour Underscore_ et par contre Computherphile a 7 images mal classifiées.
 ![confusion](imgs/confusion.png)
-Sur le test set, notre matrice de confusion montre que ...
 
 Résultats chiffrés:
-- Meilleure accuracy de validation
+- Meilleure accuracy de validation:  0.8734177350997925 at fold 1
 - F1 Score sur le test set
+- F1 Score per class: Computerphille: 0.95384615, Linus Tech Tips: 0.94252874, Underscore_: 0.90697674
+- F1 Score global: 0.9344505445547947
 
-<!-- a. Provide your plots and confusion matrices -->
-
-<!-- Provide the f-score you obtain for each of your classes. -->
-
-<!-- Provide the results you have after evaluating your model on the test set. -->
-
-La performance du test set 
-
-<!-- Comment if the performance on the test set is close to the validation performance. What about the performance of the system in the real world ? -->
-<!-- Present an analysis of the relevance of the trained system using the Class Activation Map methods (grad-cam) -->
+Notre test set n'a pas une performance très proche (-10%) par rapport à notre performation de validation.
 
 On peut maintenant analyser sur quoi se concentre notre système
 ![grad-cam](imgs/gradcam.png)
 
-Observons quelques images mal classifiées
+Observons quelques images mal classifiées, on voit que le modèle se concentre bizarrement sur des parties qui n'ont pas vraiment d'intérets comme certaines bordures, certains fonds non communs et peu souvent sur le visage de Linus ou le texte vert caractéristique de Computherphile.
 
 ![misclassified](imgs/misclassified.png)
 <!-- Provide some of your misclassi ed images (test set and real-world tests) and comment those errors. -->
 
-Nous pourrions améliorer notre dataset en 
+Nous pourrions améliorer notre dataset en ajoutant plus d'images des chaines qui ont plus de vidéos.
 <!-- Based on your results how could you improve your dataset ? -->
-g.Observe which classes are confused. Does it surprise you? In your opinion,
-what can cause those confusions ?
+<!-- g.Observe which classes are confused. Does it surprise you? In your opinion,what can cause those confusions ? -->
+
+![](imgs/gradcammisclassified.png)
 
 ## Conclusion
-En conclusion, notre F1 score global est de todo. 
+En conclusion, notre F1 score global est de **0.934**. Le fait d'avoir pris que des chaines uniquement liée à l'informatique rend l'entrainement plus compliqué.
 <!-- Conclusions: nalize your report with some conclusions, summarize your results, mention the limits of your system and potential future work. -->
