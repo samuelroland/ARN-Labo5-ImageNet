@@ -2,3 +2,5 @@ dataset_images
 .idea
 thumbnail_dl/thumbnails
 thumbnail_dl/test
+.ipynb_checkpoints
+.ipynb_checkpoints
